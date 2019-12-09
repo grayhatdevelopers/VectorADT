@@ -4,26 +4,24 @@
 using namespace std;
 
 template <typename T>
-class Vector {
+class Vector
+{
 private:
-	T* array;
 	int size;
 	int capacity;
+	T* arr;
 public:
 	typedef T* iterator;
-
 	Vector() {
-		array = nullptr;
+		arr = nullptr;
 		size = 0;
 		capacity = 0;
 	}
-
-	Vector(int Size) {
-		array = new T[Size];
+	Vector<T>(int Size) {
+		arr = new T[Size];
 		size = 0;
 		capacity = Size;
 	}
-
 	Vector(int Size, T& initialize) {
 		array = new T[Size];
 		capacity = Size;
@@ -31,60 +29,66 @@ public:
 			array[i] = initialize;
 		size = capacity;
 	}
-
 	Vector(const Vector& toCopy) {
-		array = new T[toCopy.Size()];
+		arr = new T[toCopy.Size()];
 		for (int i = 0; i < toCopy.Size(); i++) {
-			array[i] = toCopy.array[i];
+			arr[i] = toCopy.arr[i];
 		}
 		size = toCopy.Size();
 		capacity = toCopy.Capacity();
 	}
-
 	void resize(int capacity, T value = T()) {
 		int i = 0;
 		if (isEmpty())
-			array = new T[capacity];
+			arr = new T[capacity];
 		else {
 			Vector<T> tempstring = *this;
-			delete[] this->array;
-			this->array = new T[capacity];
+			delete[] this->arr;
+			this->arr = new T[capacity];
 			for (i = 0; i < size && i < capacity; i++)
-				this->array[i] = tempstring[i];
+				this->arr[i] = tempstring[i];
 		}
 		for (int j = i; j < capacity; j++) {
-			array[j] = value;
+			arr[j] = value;
 		}
 		this->capacity = capacity;
 	}
-
 	T push_back(T data) {
 		if (size == capacity)
 			resize((capacity + 1) * 2);
-		return array[size++] = data;
+		return arr[size++] = data;
 	}
 
 	T pop() {
 		if (isEmpty())
 			return T();
-		T returnTo = array[size - 1];
+		T returnTo = arr[size - 1];
 		size--;
 		return returnTo;
 	}
 
 	int find(T ex) {
 		for (int i = 0; i < size; i++)
-			if (array[i] == ex)
+			if (arr[i] == ex)
 				return i;
 		return -1;
 	}
 
 	iterator begin() {
-		return array;
+		return arr;
 	}
 
 	iterator end() {
-		return array + Size();
+		if (isEmpty())
+			return arr;
+		return arr + Size() - 1;
+	}
+
+	bool erase(iterator it) {
+		for (iterator theit = it; theit != end(); theit++)
+			*theit = *(theit + 1);
+		size--;
+		return true;
 	}
 
 	int Capacity() const {
@@ -96,54 +100,43 @@ public:
 	}
 
 	bool isEmpty() {
-		return (array == nullptr) || (size == 0);
+		return (arr == nullptr) || (size == 0);
 	}
-
-	bool erase(iterator it) {
-		for (iterator theit = it; theit != end() - 1; theit++)
-			* theit = *(theit + 1);
-		size--;
-		return true;
-	}
-
 
 	void clear() {
-		delete[] array;
+		delete[] arr;
 		size = 0;
 		capacity = 0;
 	}
 
-
-	T operator[](int index) {
-		if (isEmpty())
-			throw invalid_argument("The vector is empty!");
-		if (index < 0 || index >= size)
+	T& operator[](int index) {
+		/*if (isEmpty())
+			throw invalid_argument("The vector is empty!");*/
+		if (index < 0 || index > size)
 			throw out_of_range("The index is out of range!");
-		return array[index];
+		return arr[index];
 	}
 
 	Vector<T> operator=(const Vector& toCopy) {
 		if (!isEmpty())
 			clear();
-		array = new T[toCopy.Size()];
+		arr = new T[toCopy.Size()];
 		capacity = toCopy.Capacity();
 		for (int i = 0; i < toCopy.Size(); i++)
-			array[i] = toCopy.array[i];
+			arr[i] = toCopy.arr[i];
 		size = toCopy.Size();
 		return *this;
 	}
-
-
 
 	//append a Vector
 	Vector<T> operator+(const Vector& toCopy) {
 
 		Vector<T> tempvector;
 		for (int i = 0; i < this->size; i++)
-			tempvector.push_back(this->array[i]);
+			tempvector.push_back(this->arr[i]);
 
 		for (int i = 0; i < toCopy.Size(); i++)
-			tempvector.push_back(toCopy.array[i]);
+			tempvector.push_back(toCopy.arr[i]);
 
 		return tempvector;
 	}
@@ -156,4 +149,32 @@ public:
 
 		return *this;
 	}
+
+	T findMin();
+
+	~Vector<T>()
+	{
+		delete[]arr;
+	}
 };
+
+template <typename T>
+T Vector<T>::findMin()
+{
+	if (isEmpty())
+	{
+		return NULL;
+	}
+	else
+	{
+		T min = arr[0];
+		for (int i = 0; i < size; i++)
+		{
+			if (min > arr[i])
+			{
+				min = arr[i];
+			}
+		}
+		return min;
+	}
+}
